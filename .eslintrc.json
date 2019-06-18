@@ -25,8 +25,15 @@
         "jest": true
     },
     "rules": {
+        "react/destructuring-assignment": "off",
+        "react/no-access-state-in-setstate": "off",
+        "react/prefer-stateless-function": "off",
+        "react/forbid-prop-types": "off",
         "prettier/prettier": [
-            "error"
+            "error",
+            {
+                "endOfLine": "auto"
+            }
         ],
         "no-debugger": "off",
         "no-console": "off",
