@@ -29,6 +29,7 @@
         "react/no-access-state-in-setstate": "off",
         "react/prefer-stateless-function": "off",
         "react/forbid-prop-types": "off",
+        "react/jsx-one-expression-per-line": "off",
         "prettier/prettier": [
             "error",
             {

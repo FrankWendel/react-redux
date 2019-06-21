@@ -2,45 +2,44 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
+import { Redirect } from 'react-router-dom';
 
 import * as courseActions from '../../redux/actions/courseActions';
+import * as authorActions from '../../redux/actions/authorActions';
+import CourseList from './CourseList';
 
 // eslint-disable-next-line react/prefer-stateless-function
 class CoursesPage extends React.Component {
   state = {
-    course: {
-      title: ''
+    redirectToAddCoursePage: false
+  };
+
+  async componentDidMount() {
+    try {
+      await this.props.actions.loadCourses();
+      await this.props.actions.loadAuthors();
+    } catch (error) {
+      alert('Loading courses/authors failed' + error);
     }
-  };
-
-  handleChange = event => {
-    const course = { ...this.state.course, title: event.target.value };
-    this.setState({ course });
-  };
-
-  handleSubmit = event => {
-    event.preventDefault();
-    const { course } = this.state;
-
-    this.props.actions.createCourses(course);
-    alert(course.title);
-  };
+  }
 
   render() {
-    const { course } = this.state;
-
     return (
-      <form onSubmit={this.handleSubmit}>
+      <>
+        {this.state.redirectToAddCoursePage && <Redirect to="/course" />}
+
         <h2>Courses</h2>
-        <h3>Add Course</h3>
-        <input type="text" onChange={this.handleChange} value={course.title} />
+        <button
+          type="button"
+          style={{ marginBottom: 20 }}
+          className="btn btn-primary add-course"
+          onClick={() => this.setState({ redirectToAddCoursePage: true })}
+        >
+          Add Course
+        </button>
 
-        <input type="submit" value="Save" />
-
-        {this.props.courses.map(course => (
-          <div key={course.title}>{course.title}</div>
-        ))}
-      </form>
+        <CourseList courses={this.props.courses} />
+      </>
     );
   }
 }
@@ -52,13 +51,25 @@ CoursesPage.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    courses: state.courses
+    courses:
+      state.authors.length === 0
+        ? []
+        : state.courses.map(course => {
+            return {
+              ...course,
+              authorName: state.authors.find(a => a.id === course.authorId).name
+            };
+          }),
+    authors: state.authors
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(courseActions, dispatch)
+    actions: {
+      loadCourses: bindActionCreators(courseActions.loadCourses, dispatch),
+      loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch)
+    }
   };
 }
 
